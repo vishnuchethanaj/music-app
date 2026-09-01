@@ -57,3 +57,11 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     res.status(500).json({ success: false, message: 'Authentication service error' });
   }
 };
+
+export const restrictToArtist = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user?.isArtist) {
+    res.status(403).json({ success: false, message: 'Access denied: Artist status required' });
+    return;
+  }
+  next();
+};

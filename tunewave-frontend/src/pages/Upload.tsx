@@ -1,18 +1,59 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Sparkles, Music2, TrendingUp } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
 const Upload = () => {
+  const { user, becomeArtist } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  if (user?.isArtist) {
+    navigate('/artist-dashboard', { replace: true });
+    return null;
+  }
+
+  const handleBecomeArtist = async () => {
+    setIsLoading(true);
+    try {
+      await becomeArtist();
+      navigate('/artist-dashboard', { replace: true });
+    } catch (error) {
+      console.error('Failed to become artist', error);
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="p-4 space-y-6 flex flex-col items-center justify-center min-h-full">
-      <div className="text-center space-y-4 max-w-sm mx-auto">
-        <div className="w-20 h-20 bg-brand-primary/20 text-brand-primary rounded-full flex items-center justify-center mx-auto">
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-          </svg>
+    <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
+      <div className="w-full max-w-sm space-y-8">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+          <Sparkles size={40} />
         </div>
-        <h1 className="text-2xl font-bold">Become an Artist</h1>
-        <p className="text-text-secondary text-sm">
-          Upload your original music and share it with the world. Join our community of independent creators.
-        </p>
-        <button className="w-full py-3 bg-brand-primary text-white font-semibold rounded-full mt-6 shadow-lg shadow-brand-primary/30">
-          Start Uploading
+        <div className="space-y-4">
+          <h1 className="text-3xl font-black tracking-tight">Become an Artist</h1>
+          <p className="text-text-secondary leading-relaxed">
+            Ready to share your sound? Join the TuneWave artist community and publish your original music to the world.
+          </p>
+        </div>
+
+        <div className="space-y-4 text-left">
+          <div className="flex items-center gap-4 rounded-2xl bg-bg-surface p-4">
+            <Music2 className="text-brand-primary" />
+            <span className="text-sm">Publish original tracks</span>
+          </div>
+          <div className="flex items-center gap-4 rounded-2xl bg-bg-surface p-4">
+            <TrendingUp className="text-brand-secondary" />
+            <span className="text-sm">Track your audience</span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleBecomeArtist}
+          disabled={isLoading}
+          className="w-full rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary px-6 py-4 font-bold text-white shadow-lg shadow-brand-primary/20 transition disabled:opacity-50"
+        >
+          {isLoading ? 'Processing...' : 'Become an Artist'}
         </button>
       </div>
     </div>

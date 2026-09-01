@@ -9,6 +9,7 @@ import {
   type LoginPayload,
   type RegisterPayload,
 } from '../api/auth';
+import api from '../api/axios';
 
 type AuthContextValue = {
   user: AuthUser | null;
@@ -19,6 +20,7 @@ type AuthContextValue = {
   register: (payload: RegisterPayload) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  becomeArtist: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -75,6 +77,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     [storeSession],
   );
 
+  const becomeArtist = useCallback(async () => {
+    const response = await api.post<{ user: AuthUser }>('/artist/become');
+    setUser(response.data.user);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       if (localStorage.getItem(authTokenStorageKey)) {
@@ -117,8 +124,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       register,
       logout,
       refreshUser,
+      becomeArtist,
     }),
-    [user, token, loading, login, register, logout, refreshUser],
+    [user, token, loading, login, register, logout, refreshUser, becomeArtist],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

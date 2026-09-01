@@ -8,6 +8,7 @@ export interface User {
   profileImage: string;
   isArtist: boolean;
   bio: string;
+  artistName?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,6 +48,11 @@ const UserSchema = new Schema<User>(
       type: String,
       default: '',
       maxlength: [280, 'Bio must be 280 characters or less'],
+    },
+    artistName: {
+      type: String,
+      trim: true,
+      maxlength: [50, 'Artist name must be 50 characters or less'],
     },
   },
   {

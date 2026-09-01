@@ -1,7 +1,7 @@
-import type { ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ArtistProtectedRoute from './components/ArtistProtectedRoute';
 import BottomNav from './components/BottomNav';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
@@ -11,8 +11,9 @@ import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ArtistDashboard from './pages/ArtistDashboard';
+import ArtistProfile from './pages/ArtistProfile';
 
-const AuthRedirect = ({ children }: { children: ReactElement }) => {
+const AuthRedirect = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (!loading && isAuthenticated) {
@@ -38,7 +39,8 @@ const AppContent = () => {
           <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
           <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/artist-dashboard" element={<ProtectedRoute><ArtistDashboard /></ProtectedRoute>} />
+          <Route path="/artist-dashboard" element={<ArtistProtectedRoute><ArtistDashboard /></ArtistProtectedRoute>} />
+          <Route path="/artist/:id" element={<ArtistProfile />} />
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
