@@ -9,6 +9,8 @@ export interface User {
   isArtist: boolean;
   bio: string;
   artistName?: string;
+  role: 'user' | 'admin';
+  status: 'active' | 'suspended';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,6 +55,16 @@ const UserSchema = new Schema<User>(
       type: String,
       trim: true,
       maxlength: [50, 'Artist name must be 50 characters or less'],
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
+    status: {
+      type: String,
+      enum: ['active', 'suspended'],
+      default: 'active',
     },
   },
   {

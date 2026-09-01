@@ -8,39 +8,32 @@ export interface AuthRequest extends Request {
 
 const getJwtSecret = (): string => {
   const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    throw new Error('JWT_SECRET is not configured');
-  }
-
+  if (!secret) throw new Error('JWT_SECRET is not configured');
   return secret;
 };
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   const authorization = req.headers.authorization;
-
   if (!authorization?.startsWith('Bearer ')) {
     res.status(401).json({ success: false, message: 'Missing authentication token' });
     return;
   }
-
   const token = authorization.split(' ')[1];
-
   try {
     const decoded = jwt.verify(token, getJwtSecret());
-
     if (typeof decoded === 'string' || typeof decoded.id !== 'string') {
       res.status(401).json({ success: false, message: 'Invalid authentication token' });
       return;
     }
-
     const user = await User.findById(decoded.id);
-
     if (!user) {
       res.status(401).json({ success: false, message: 'Authenticated user no longer exists' });
       return;
     }
-
+    if (user.status === 'suspended') {
+      res.status(403).json({ success: false, message: 'Account suspended' });
+      return;
+    }
     req.user = user;
     next();
   } catch (error) {
@@ -48,12 +41,10 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
       res.status(401).json({ success: false, message: 'Authentication token has expired' });
       return;
     }
-
     if (error instanceof JsonWebTokenError) {
       res.status(401).json({ success: false, message: 'Invalid authentication token' });
       return;
     }
-
     res.status(500).json({ success: false, message: 'Authentication service error' });
   }
 };
@@ -61,6 +52,14 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
 export const restrictToArtist = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (!req.user?.isArtist) {
     res.status(403).json({ success: false, message: 'Access denied: Artist status required' });
+    return;
+  }
+  next();
+};
+
+export const restrictToAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (req.user?.role !== 'admin') {
+    res.status(403).json({ success: false, message: 'Access denied: Admin role required' });
     return;
   }
   next();

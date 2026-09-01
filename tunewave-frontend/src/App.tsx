@@ -5,6 +5,7 @@ import { LibraryProvider } from './context/LibraryContext';
 import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ArtistProtectedRoute from './components/ArtistProtectedRoute';
+import AdminProtectedRoute from './components/AdminProtectedRoute';
 import BottomNav from './components/BottomNav';
 import MusicPlayer from './components/MusicPlayer';
 import Home from './pages/Home';
@@ -20,6 +21,9 @@ import ArtistProfile from './pages/ArtistProfile';
 import SongDetails from './pages/SongDetails';
 import NowPlaying from './pages/NowPlaying';
 import NotificationsPage from './pages/Notifications';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminSongs from './pages/admin/AdminSongs';
 
 const AuthRedirect = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -49,6 +53,11 @@ const AppContent = () => {
           <Route path="/artist/:id" element={<ArtistProfile />} />
           <Route path="/song/:id" element={<SongDetails />} />
           <Route path="/now-playing" element={<NowPlaying />} />
+          
+          <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+          <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
+          <Route path="/admin/songs" element={<AdminProtectedRoute><AdminSongs /></AdminProtectedRoute>} />
+          
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>

@@ -1,6 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Settings, ShieldCheck, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { LogOut, Settings, ShieldCheck, Sparkles, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
@@ -60,6 +60,16 @@ const Profile = () => {
           </div>
           <span className="text-text-secondary">›</span>
         </Link>
+        
+        {user.role === 'admin' && (
+          <Link to="/admin" className="flex items-center justify-between rounded-2xl px-1 py-3 text-brand-primary">
+            <div className="flex items-center gap-3">
+              <LayoutDashboard size={19} />
+              <span className="font-medium">Admin Panel</span>
+            </div>
+            <span className="text-brand-primary">›</span>
+          </Link>
+        )}
 
         <button
           type="button"
