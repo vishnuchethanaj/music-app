@@ -1,7 +1,8 @@
 import { Router, type Response } from 'express';
-import { protect, restrictToArtist, type AuthRequest } from '../middleware/auth';
+import { protect, type AuthRequest } from '../middleware/auth';
 import Follow from '../models/Follow';
 import User from '../models/User';
+import Notification from '../models/Notification';
 
 const router = Router();
 
@@ -24,6 +25,12 @@ router.post('/:id/follow', protect, async (req: AuthRequest, res: Response): Pro
 
   try {
     await Follow.create({ followerId, artistId });
+    await Notification.create({
+      recipientId: artistId,
+      senderId: followerId,
+      type: 'FOLLOW',
+      message: `${req.user?.username} started following you.`
+    });
     const followersCount = await Follow.countDocuments({ artistId });
     res.status(200).json({ success: true, following: true, followersCount });
   } catch (error) {
@@ -62,7 +69,7 @@ router.get('/following', protect, async (req: AuthRequest, res: Response): Promi
 
 // @route   GET /api/artists/dashboard/followers
 // @desc    Get follower stats
-router.get('/dashboard/followers', protect, restrictToArtist, async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/dashboard/followers', protect, async (req: AuthRequest, res: Response): Promise<void> => {
   const followers = await Follow.find({ artistId: req.user?._id }).populate('followerId', 'username profileImage');
   res.status(200).json({ success: true, data: followers });
 });

@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PlayerProvider } from './context/PlayerContext';
 import { LibraryProvider } from './context/LibraryContext';
+import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ArtistProtectedRoute from './components/ArtistProtectedRoute';
 import BottomNav from './components/BottomNav';
@@ -18,6 +19,7 @@ import ArtistDashboard from './pages/ArtistDashboard';
 import ArtistProfile from './pages/ArtistProfile';
 import SongDetails from './pages/SongDetails';
 import NowPlaying from './pages/NowPlaying';
+import NotificationsPage from './pages/Notifications';
 
 const AuthRedirect = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -42,6 +44,7 @@ const AppContent = () => {
           <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
           <Route path="/following" element={<ProtectedRoute><Following /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/artist-dashboard" element={<ArtistProtectedRoute><ArtistDashboard /></ArtistProtectedRoute>} />
           <Route path="/artist/:id" element={<ArtistProfile />} />
           <Route path="/song/:id" element={<SongDetails />} />
@@ -60,9 +63,11 @@ function App() {
     <AuthProvider>
       <PlayerProvider>
         <LibraryProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <NotificationProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </NotificationProvider>
         </LibraryProvider>
       </PlayerProvider>
     </AuthProvider>

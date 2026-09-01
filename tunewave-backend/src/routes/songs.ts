@@ -1,9 +1,12 @@
-import { Router, type Response } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { protect, restrictToArtist, type AuthRequest } from '../middleware/auth';
 import upload from '../middleware/upload';
 import cloudinary from '../config/cloudinary';
 import Song from '../models/Song';
 import Follow from '../models/Follow';
+import SongLike from '../models/SongLike';
+import Notification from '../models/Notification';
+
 const router = Router();
 
 // @route   POST /api/songs/upload
@@ -56,6 +59,17 @@ router.post(
         artistName: req.user?.username,
       });
 
+      // Notify followers
+      const followers = await Follow.find({ artistId: req.user?._id });
+      await Notification.insertMany(followers.map(f => ({
+        recipientId: f.followerId,
+        senderId: req.user?._id,
+        type: 'NEW_SONG',
+        songId: song._id,
+        artistId: req.user?._id,
+        message: `${req.user?.username} released a new song: ${song.title}.`
+      })));
+
       res.status(201).json({ success: true, song });
     } catch (error) {
       console.error(error);
@@ -87,8 +101,6 @@ router.delete('/:id', protect, restrictToArtist, async (req: AuthRequest, res: R
   res.status(200).json({ success: true, message: 'Song deleted' });
 });
 
-// @route   GET /api/songs
-// @desc    Get all published songs
 // @route   GET /api/songs/followed
 // @desc    Get songs from followed artists
 router.get('/followed', protect, async (req: AuthRequest, res: Response): Promise<void> => {
@@ -98,9 +110,9 @@ router.get('/followed', protect, async (req: AuthRequest, res: Response): Promis
   res.status(200).json({ success: true, data: songs });
 });
 
- // @route   GET /api/songs
- // @desc    Get all published songs
- router.get('/', async (_req, res: Response): Promise<void> => {
+// @route   GET /api/songs
+// @desc    Get all published songs
+router.get('/', async (_req, res: Response): Promise<void> => {
   const songs = await Song.find({ status: 'published' }).sort({ createdAt: -1 });
   res.status(200).json({ success: true, data: songs });
 });
@@ -116,8 +128,23 @@ router.post('/:id/play', async (req: Request, res: Response): Promise<void> => {
 
 router.post('/:id/like', protect, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const song = await Song.findById(req.params.id);
+    if (!song) {
+        res.status(404).json({ success: false, message: 'Song not found' });
+        return;
+    }
     await SongLike.create({ userId: req.user?._id, songId: req.params.id });
     await Song.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } });
+    
+    if (song.artistId.toString() !== req.user?._id.toString()) {
+        await Notification.create({
+            recipientId: song.artistId,
+            senderId: req.user?._id,
+            type: 'LIKE',
+            songId: song._id,
+            message: `${req.user?.username} liked your song '${song.title}'.`
+        });
+    }
     res.status(200).json({ success: true });
   } catch (error) {
     res.status(400).json({ success: false, message: 'Already liked' });
@@ -131,4 +158,5 @@ router.delete('/:id/like', protect, async (req: AuthRequest, res: Response): Pro
   }
   res.status(200).json({ success: true });
 });
+
 export default router;

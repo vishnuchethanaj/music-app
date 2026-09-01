@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import NotificationBell from '../components/NotificationBell';
 import api from '../api/axios';
 import { usePlayer, type Song } from '../context/PlayerContext';
 
@@ -15,7 +15,10 @@ const Home = () => {
 
   return (
     <div className="p-4 space-y-8 pb-24">
-      <h1 className="text-2xl font-black">TuneWave</h1>
+      <header className="flex justify-between items-center">
+        <h1 className="text-2xl font-black">TuneWave</h1>
+        <NotificationBell />
+      </header>
       
       <section>
         <h2 className="text-lg font-bold mb-3">From Artists You Follow</h2>
