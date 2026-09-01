@@ -7,6 +7,7 @@ import artistRoutes from './routes/artist';
 import songRoutes from './routes/songs';
 import playlistRoutes from './routes/playlists';
 import recentlyPlayedRoutes from './routes/recentlyPlayed';
+import followRoutes from './routes/follow';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use('/api/artist', artistRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/songs', recentlyPlayedRoutes);
+app.use('/api/artists', followRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ success: true, message: 'TuneWave API is running' });

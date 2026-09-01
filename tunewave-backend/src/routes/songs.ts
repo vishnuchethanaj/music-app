@@ -3,7 +3,7 @@ import { protect, restrictToArtist, type AuthRequest } from '../middleware/auth'
 import upload from '../middleware/upload';
 import cloudinary from '../config/cloudinary';
 import Song from '../models/Song';
-import SongLike from '../models/SongLike';
+import Follow from '../models/Follow';
 const router = Router();
 
 // @route   POST /api/songs/upload
@@ -89,7 +89,18 @@ router.delete('/:id', protect, restrictToArtist, async (req: AuthRequest, res: R
 
 // @route   GET /api/songs
 // @desc    Get all published songs
-router.get('/', async (_req, res: Response): Promise<void> => {
+// @route   GET /api/songs/followed
+// @desc    Get songs from followed artists
+router.get('/followed', protect, async (req: AuthRequest, res: Response): Promise<void> => {
+  const following = await Follow.find({ followerId: req.user?._id }).select('artistId');
+  const artistIds = following.map(f => f.artistId);
+  const songs = await Song.find({ artistId: { $in: artistIds }, status: 'published' }).sort({ createdAt: -1 });
+  res.status(200).json({ success: true, data: songs });
+});
+
+ // @route   GET /api/songs
+ // @desc    Get all published songs
+ router.get('/', async (_req, res: Response): Promise<void> => {
   const songs = await Song.find({ status: 'published' }).sort({ createdAt: -1 });
   res.status(200).json({ success: true, data: songs });
 });

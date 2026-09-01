@@ -37,6 +37,8 @@ type AuthContextValue = {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   becomeArtist: () => Promise<void>;
+  followArtist: (artistId: string) => Promise<void>;
+  unfollowArtist: (artistId: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -98,6 +100,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(response.data.user);
   }, []);
 
+  const followArtist = useCallback(async (artistId: string) => {
+    await api.post(`/artists/${artistId}/follow`);
+  }, []);
+
+  const unfollowArtist = useCallback(async (artistId: string) => {
+    await api.delete(`/artists/${artistId}/follow`);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       if (localStorage.getItem(authTokenStorageKey)) {
@@ -141,8 +151,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       logout,
       refreshUser,
       becomeArtist,
+      followArtist,
+      unfollowArtist,
     }),
-    [user, token, loading, login, register, logout, refreshUser, becomeArtist],
+    [user, token, loading, login, register, logout, refreshUser, becomeArtist, followArtist, unfollowArtist],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

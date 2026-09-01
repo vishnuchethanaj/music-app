@@ -11,6 +11,7 @@ import Discover from './pages/Discover';
 import Upload from './pages/Upload';
 import Library from './pages/Library';
 import Profile from './pages/Profile';
+import Following from './pages/Following';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ArtistDashboard from './pages/ArtistDashboard';
@@ -39,6 +40,7 @@ const AppContent = () => {
           <Route path="/discover" element={<Discover />} />
           <Route path="/upload" element={<ArtistProtectedRoute><Upload /></ArtistProtectedRoute>} />
           <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+          <Route path="/following" element={<ProtectedRoute><Following /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/artist-dashboard" element={<ArtistProtectedRoute><ArtistDashboard /></ArtistProtectedRoute>} />
           <Route path="/artist/:id" element={<ArtistProfile />} />
