@@ -11,6 +11,22 @@ import {
 } from '../api/auth';
 import api from '../api/axios';
 
+export type Song = {
+  _id: string;
+  title: string;
+  artistName: string;
+  artistId: string;
+  audioUrl: string;
+  coverUrl: string;
+  genre: string;
+  description: string;
+  duration: number;
+  plays: number;
+  likes: number;
+  status: 'draft' | 'published';
+  createdAt: string;
+};
+
 type AuthContextValue = {
   user: AuthUser | null;
   token: string | null;

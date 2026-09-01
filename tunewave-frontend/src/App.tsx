@@ -1,8 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PlayerProvider } from './context/PlayerContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ArtistProtectedRoute from './components/ArtistProtectedRoute';
 import BottomNav from './components/BottomNav';
+import MusicPlayer from './components/MusicPlayer';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
 import Upload from './pages/Upload';
@@ -12,40 +14,40 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ArtistDashboard from './pages/ArtistDashboard';
 import ArtistProfile from './pages/ArtistProfile';
+import SongDetails from './pages/SongDetails';
+import NowPlaying from './pages/NowPlaying';
 
 const AuthRedirect = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
-
-  if (!loading && isAuthenticated) {
-    return <Navigate to="/home" replace />;
-  }
-
+  if (!loading && isAuthenticated) return <Navigate to="/home" replace />;
   return children;
 };
 
 const AppContent = () => {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/now-playing';
 
   return (
     <div className="flex h-screen flex-col bg-bg-base text-text-primary">
-      <main className={`flex-1 overflow-y-auto ${!isAuthPage ? 'pb-20' : ''}`}>
+      <main className={`flex-1 overflow-y-auto ${!isAuthPage ? 'pb-32' : ''}`}>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
           <Route path="/signup" element={<AuthRedirect><Signup /></AuthRedirect>} />
           <Route path="/home" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
-          <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
+          <Route path="/upload" element={<ArtistProtectedRoute><Upload /></ArtistProtectedRoute>} />
           <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/artist-dashboard" element={<ArtistProtectedRoute><ArtistDashboard /></ArtistProtectedRoute>} />
           <Route path="/artist/:id" element={<ArtistProfile />} />
+          <Route path="/song/:id" element={<SongDetails />} />
+          <Route path="/now-playing" element={<NowPlaying />} />
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
-
       {!isAuthPage && <BottomNav />}
+      {!isAuthPage && <MusicPlayer />}
     </div>
   );
 };
@@ -53,9 +55,11 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <PlayerProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </PlayerProvider>
     </AuthProvider>
   );
 }

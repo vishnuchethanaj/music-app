@@ -1,45 +1,46 @@
+import { useState, useEffect } from 'react';
+import { Play } from 'lucide-react';
+import api from '../api/axios';
+import { usePlayer } from '../context/PlayerContext';
+
+type Song = {
+  _id: string;
+  title: string;
+  artistName: string;
+  audioUrl: string;
+  coverUrl: string;
+  genre: string;
+  duration: number;
+};
+
 const Home = () => {
+  const [songs, setSongs] = useState<Song[]>([]);
+  const { playSong } = usePlayer();
+
+  useEffect(() => {
+    api.get<{ data: Song[] }>('/songs').then((res) => setSongs(res.data.data));
+  }, []);
+
   return (
     <div className="p-4 space-y-6">
-      <header className="flex justify-between items-center py-2">
-        <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary">
-          TuneWave
-        </h1>
-        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">
-          <span className="text-sm font-semibold">U</span>
-        </div>
-      </header>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Trending Now</h2>
-        <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="min-w-[140px] space-y-2">
-              <div className="w-[140px] h-[140px] bg-slate-700 rounded-2xl shadow-lg"></div>
-              <p className="font-medium text-sm truncate">Song Title {i}</p>
-              <p className="text-xs text-text-secondary truncate">Artist Name</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">New Releases</h2>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center p-3 bg-bg-surface rounded-xl space-x-4">
-              <div className="w-16 h-16 bg-slate-600 rounded-lg shadow-md"></div>
-              <div className="flex-1">
-                <p className="font-medium">Track {i}</p>
-                <p className="text-sm text-text-secondary">Independent Artist</p>
-              </div>
-              <button className="w-8 h-8 rounded-full bg-brand-primary/20 text-brand-primary flex items-center justify-center">
-                ▶
+      <h1 className="text-2xl font-black">Trending Now</h1>
+      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
+        {songs.map((song) => (
+          <div key={song._id} className="min-w-[140px] space-y-2">
+            <div className="relative w-[140px] h-[140px] rounded-2xl shadow-lg overflow-hidden">
+              <img src={song.coverUrl} className="w-full h-full object-cover" />
+              <button 
+                onClick={() => playSong(song, songs)} 
+                className="absolute bottom-2 right-2 p-2 bg-brand-primary rounded-full"
+              >
+                <Play size={16} fill="white" />
               </button>
             </div>
-          ))}
-        </div>
-      </section>
+            <p className="font-medium text-sm truncate">{song.title}</p>
+            <p className="text-xs text-text-secondary truncate">{song.artistName}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
