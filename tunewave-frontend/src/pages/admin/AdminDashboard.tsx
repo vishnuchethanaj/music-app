@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Play, Heart, Users, Music2, AlertCircle } from 'lucide-react';
+import { Play, Heart, Users, Music2 } from 'lucide-react';
 import api from '../../api/axios';
 
 type Stats = {
@@ -24,26 +24,26 @@ const AdminDashboard = () => {
   if (!stats) return <div className="p-6 text-red-400">Failed to load admin dashboard</div>;
 
   return (
-    <div className="p-4 space-y-6 pb-24">
+    <div className="p-4 space-y-8 pb-24 max-w-4xl mx-auto">
       <h1 className="text-2xl font-black">Admin Dashboard</h1>
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-bg-surface p-4 rounded-3xl border border-slate-700">
-            <Users className="text-brand-primary mb-2"/>
+        <div className="card">
+            <Users className="text-brand-primary mb-2" size={20}/>
             <p className="text-2xl font-black">{stats.totalUsers}</p>
             <p className="text-xs text-text-secondary">Total Users</p>
         </div>
-        <div className="bg-bg-surface p-4 rounded-3xl border border-slate-700">
-            <Music2 className="text-brand-secondary mb-2"/>
+        <div className="card">
+            <Music2 className="text-brand-secondary mb-2" size={20}/>
             <p className="text-2xl font-black">{stats.totalSongs}</p>
             <p className="text-xs text-text-secondary">Total Songs</p>
         </div>
-        <div className="bg-bg-surface p-4 rounded-3xl border border-slate-700">
-            <Play className="text-emerald-400 mb-2"/>
+        <div className="card">
+            <Play className="text-emerald-400 mb-2" size={20}/>
             <p className="text-2xl font-black">{stats.totalPlays.toLocaleString()}</p>
             <p className="text-xs text-text-secondary">Total Plays</p>
         </div>
-        <div className="bg-bg-surface p-4 rounded-3xl border border-slate-700">
-            <Heart className="text-red-400 mb-2"/>
+        <div className="card">
+            <Heart className="text-red-400 mb-2" size={20}/>
             <p className="text-2xl font-black">{stats.totalLikes.toLocaleString()}</p>
             <p className="text-xs text-text-secondary">Total Likes</p>
         </div>

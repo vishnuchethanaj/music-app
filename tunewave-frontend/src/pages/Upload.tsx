@@ -43,25 +43,25 @@ const Upload = () => {
   return (
     <div className="p-4 space-y-6 pb-24">
       <h1 className="text-2xl font-black">Upload Song</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && <div className="text-red-500 text-sm">{error}</div>}
+      <form onSubmit={handleSubmit} className="space-y-4 card">
+        {error && <div className="text-red-400 text-sm p-2 bg-red-950/30 rounded-lg">{error}</div>}
         
-        <input type="text" placeholder="Song Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-bg-surface p-3 rounded-xl" />
-        <input type="text" placeholder="Genre" value={genre} onChange={(e) => setGenre(e.target.value)} className="w-full bg-bg-surface p-3 rounded-xl" />
-        <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-bg-surface p-3 rounded-xl" />
+        <input type="text" placeholder="Song Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full input-field" />
+        <input type="text" placeholder="Genre" value={genre} onChange={(e) => setGenre(e.target.value)} className="w-full input-field" />
+        <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full input-field" />
 
         <div className="flex gap-4">
-          <label className="flex-1 cursor-pointer bg-slate-700 p-4 rounded-xl flex items-center justify-center gap-2">
+          <label className="flex-1 cursor-pointer bg-slate-700/50 p-4 rounded-xl flex items-center justify-center gap-2 border border-slate-700">
             <Music2 size={18} /> {audioFile ? audioFile.name : 'Select Audio'}
             <input type="file" accept="audio/*" onChange={(e) => setAudioFile(e.target.files?.[0] || null)} className="hidden" />
           </label>
-          <label className="flex-1 cursor-pointer bg-slate-700 p-4 rounded-xl flex items-center justify-center gap-2">
+          <label className="flex-1 cursor-pointer bg-slate-700/50 p-4 rounded-xl flex items-center justify-center gap-2 border border-slate-700">
             <ImageIcon size={18} /> {coverFile ? coverFile.name : 'Select Cover'}
             <input type="file" accept="image/*" onChange={(e) => setCoverFile(e.target.files?.[0] || null)} className="hidden" />
           </label>
         </div>
 
-        <button type="submit" disabled={isLoading} className="w-full bg-brand-primary p-3 rounded-xl font-bold">
+        <button type="submit" disabled={isLoading} className="w-full btn-primary">
           {isLoading ? 'Uploading...' : 'Publish Song'}
         </button>
       </form>

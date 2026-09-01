@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PlayerProvider } from './context/PlayerContext';
 import { LibraryProvider } from './context/LibraryContext';
@@ -21,9 +22,11 @@ import ArtistProfile from './pages/ArtistProfile';
 import SongDetails from './pages/SongDetails';
 import NowPlaying from './pages/NowPlaying';
 import NotificationsPage from './pages/Notifications';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminSongs from './pages/admin/AdminSongs';
+
+// Lazy load admin pages
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminSongs = lazy(() => import('./pages/admin/AdminSongs'));
 
 const AuthRedirect = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -38,28 +41,30 @@ const AppContent = () => {
   return (
     <div className="flex h-screen flex-col bg-bg-base text-text-primary">
       <main className={`flex-1 overflow-y-auto ${!isAuthPage ? 'pb-32' : ''}`}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
-          <Route path="/signup" element={<AuthRedirect><Signup /></AuthRedirect>} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/upload" element={<ArtistProtectedRoute><Upload /></ArtistProtectedRoute>} />
-          <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
-          <Route path="/following" element={<ProtectedRoute><Following /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-          <Route path="/artist-dashboard" element={<ArtistProtectedRoute><ArtistDashboard /></ArtistProtectedRoute>} />
-          <Route path="/artist/:id" element={<ArtistProfile />} />
-          <Route path="/song/:id" element={<SongDetails />} />
-          <Route path="/now-playing" element={<NowPlaying />} />
-          
-          <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
-          <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
-          <Route path="/admin/songs" element={<AdminProtectedRoute><AdminSongs /></AdminProtectedRoute>} />
-          
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
+        <Suspense fallback={<div className="p-6">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
+            <Route path="/signup" element={<AuthRedirect><Signup /></AuthRedirect>} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/upload" element={<ArtistProtectedRoute><Upload /></ArtistProtectedRoute>} />
+            <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+            <Route path="/following" element={<ProtectedRoute><Following /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+            <Route path="/artist-dashboard" element={<ArtistProtectedRoute><ArtistDashboard /></ArtistProtectedRoute>} />
+            <Route path="/artist/:id" element={<ArtistProfile />} />
+            <Route path="/song/:id" element={<SongDetails />} />
+            <Route path="/now-playing" element={<NowPlaying />} />
+            
+            <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
+            <Route path="/admin/songs" element={<AdminProtectedRoute><AdminSongs /></AdminProtectedRoute>} />
+            
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </Suspense>
       </main>
       {!isAuthPage && <BottomNav />}
       {!isAuthPage && <MusicPlayer />}

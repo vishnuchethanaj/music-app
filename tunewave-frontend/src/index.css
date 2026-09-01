@@ -14,3 +14,15 @@ body {
   color: var(--color-text-primary);
   font-family: 'Inter', system-ui, sans-serif;
 }
+
+@layer components {
+  .card {
+    @apply bg-bg-surface border border-slate-700 rounded-3xl p-4;
+  }
+  .btn-primary {
+    @apply bg-brand-primary text-white font-bold py-3 px-6 rounded-full transition hover:bg-indigo-600 disabled:opacity-50;
+  }
+  .input-field {
+    @apply bg-bg-surface border border-slate-700 p-3 rounded-xl focus:border-brand-primary focus:outline-none;
+  }
+}

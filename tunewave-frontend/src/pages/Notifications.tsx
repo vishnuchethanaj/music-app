@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/NotificationContext';
 import { CheckCircle } from 'lucide-react';
@@ -14,17 +13,17 @@ const NotificationsPage = () => {
   };
 
   return (
-    <div className="p-4 space-y-4 pb-24">
+    <div className="p-4 space-y-4 pb-24 max-w-2xl mx-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-black">Notifications</h1>
         <button onClick={markAllAsRead} className="text-sm text-brand-primary font-bold">Mark all as read</button>
       </div>
-      {notifications.length === 0 && <p className="text-text-secondary text-sm text-center pt-10">No notifications yet.</p>}
+      {notifications.length === 0 && <p className="card text-text-secondary text-sm text-center pt-10">No notifications yet.</p>}
       {notifications.map(n => (
         <div 
           key={n._id} 
           onClick={() => handleNotificationClick(n)}
-          className={`p-4 rounded-xl flex items-center gap-4 ${n.isRead ? 'bg-bg-surface' : 'bg-brand-primary/10'}`}
+          className={`card p-4 flex items-center gap-4 cursor-pointer ${n.isRead ? 'opacity-70' : 'border-brand-primary'}`}
         >
           <div className="flex-1">
             <p className="font-semibold text-sm">{n.message}</p>
