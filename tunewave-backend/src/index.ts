@@ -4,6 +4,9 @@ import cors from 'cors';
 import connectDB from './config/db';
 import authRoutes from './routes/auth';
 import artistRoutes from './routes/artist';
+import songRoutes from './routes/songs';
+import playlistRoutes from './routes/playlists';
+import recentlyPlayedRoutes from './routes/recentlyPlayed';
 
 dotenv.config();
 
@@ -15,6 +18,9 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/artist', artistRoutes);
+app.use('/api/songs', songRoutes);
+app.use('/api/playlists', playlistRoutes);
+app.use('/api/songs', recentlyPlayedRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ success: true, message: 'TuneWave API is running' });

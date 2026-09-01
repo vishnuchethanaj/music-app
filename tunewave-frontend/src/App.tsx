@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PlayerProvider } from './context/PlayerContext';
+import { LibraryProvider } from './context/LibraryContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ArtistProtectedRoute from './components/ArtistProtectedRoute';
 import BottomNav from './components/BottomNav';
@@ -56,9 +57,11 @@ function App() {
   return (
     <AuthProvider>
       <PlayerProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <LibraryProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </LibraryProvider>
       </PlayerProvider>
     </AuthProvider>
   );
