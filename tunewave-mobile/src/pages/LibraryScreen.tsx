@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import api from '../api/axios';
 import { type Song } from '../context/PlayerContext';
 
@@ -9,30 +9,46 @@ type Playlist = {
     songs: Song[];
 };
 
-const LibraryScreen = () => {
+const LibraryScreen = ({ navigation }: any) => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [likedSongs, setLikedSongs] = useState<Song[]>([]);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+
+  const fetchPlaylists = async () => {
+    const res = await api.get<{ data: Playlist[] }>('/playlists');
+    setPlaylists(res.data.data);
+  };
 
   useEffect(() => {
-    api.get<{ data: Playlist[] }>('/playlists').then((res) => setPlaylists(res.data.data));
-    // Assuming endpoint exists for liked songs - I should check backend
-    api.get<{ data: Song[] }>('/songs/liked').then((res) => setLikedSongs(res.data.data)).catch(() => setLikedSongs([]));
+    fetchPlaylists();
   }, []);
+
+  const createPlaylist = async () => {
+    if (!newPlaylistName) return;
+    await api.post('/playlists', { name: newPlaylistName });
+    setNewPlaylistName('');
+    fetchPlaylists();
+  };
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Your Library</Text>
       
+      <View style={styles.inputContainer}>
+        <TextInput 
+            style={styles.input} 
+            placeholder="New Playlist Name" 
+            placeholderTextColor="#666" 
+            value={newPlaylistName} 
+            onChangeText={setNewPlaylistName} 
+        />
+        <TouchableOpacity style={styles.createButton} onPress={createPlaylist}><Text style={styles.buttonText}>Create</Text></TouchableOpacity>
+      </View>
+
       <Text style={styles.sectionTitle}>Playlists</Text>
       {playlists.map((pl) => (
-        <TouchableOpacity key={pl._id} style={styles.item}>
+        <TouchableOpacity key={pl._id} style={styles.item} onPress={() => navigation.navigate('PlaylistDetails', { playlistId: pl._id })}>
           <Text style={styles.itemText}>{pl.name}</Text>
         </TouchableOpacity>
-      ))}
-
-      <Text style={styles.sectionTitle}>Liked Songs</Text>
-      {likedSongs.map((song) => (
-        <Text key={song._id} style={styles.itemText}>{song.title}</Text>
       ))}
     </ScrollView>
   );
@@ -41,7 +57,11 @@ const LibraryScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, paddingTop: 50, backgroundColor: '#121212' },
   header: { fontSize: 24, fontWeight: '900', color: '#FFF', marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#FFF', marginTop: 20, marginBottom: 10 },
+  inputContainer: { flexDirection: 'row', marginBottom: 20 },
+  input: { flex: 1, backgroundColor: '#1E1E1E', color: '#FFF', padding: 10, borderRadius: 8 },
+  createButton: { backgroundColor: '#007AFF', padding: 10, borderRadius: 8, marginLeft: 10 },
+  buttonText: { color: '#FFF' },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#FFF', marginBottom: 10 },
   item: { padding: 15, backgroundColor: '#1E1E1E', borderRadius: 8, marginBottom: 10 },
   itemText: { color: '#FFF' },
 });
