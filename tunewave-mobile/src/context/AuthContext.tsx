@@ -1,0 +1,173 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authTokenStorageKey } from '../api/axios';
+import {
+  getCurrentUser,
+  loginUser,
+  logoutUser,
+  registerUser,
+  type AuthUser,
+  type LoginPayload,
+  type RegisterPayload,
+} from '../api/auth';
+import api from '../api/axios';
+
+export type Song = {
+  _id: string;
+  title: string;
+  artistName: string;
+  artistId: string;
+  audioUrl: string;
+  coverUrl: string;
+  genre: string;
+  description: string;
+  duration: number;
+  plays: number;
+  likes: number;
+  status: 'draft' | 'published';
+  createdAt: string;
+};
+
+type AuthContextValue = {
+  user: AuthUser | null;
+  token: string | null;
+  loading: boolean;
+  isAuthenticated: boolean;
+  login: (payload: LoginPayload) => Promise<AuthUser>;
+  register: (payload: RegisterPayload) => Promise<AuthUser>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  becomeArtist: () => Promise<void>;
+  followArtist: (artistId: string) => Promise<void>;
+  unfollowArtist: (artistId: string) => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+type AuthProviderProps = {
+  children: ReactNode;
+};
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const storeSession = useCallback(async (newToken: string, authenticatedUser: AuthUser) => {
+    await AsyncStorage.setItem(authTokenStorageKey, newToken);
+    setToken(newToken);
+    setUser(authenticatedUser);
+  }, []);
+
+  const clearSession = useCallback(async () => {
+    await AsyncStorage.removeItem(authTokenStorageKey);
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const storedToken = await AsyncStorage.getItem(authTokenStorageKey);
+
+    if (!storedToken) {
+      await clearSession();
+      return;
+    }
+
+    const currentUser = await getCurrentUser();
+    setToken(storedToken);
+    setUser(currentUser);
+  }, [clearSession]);
+
+  const login = useCallback(
+    async (payload: LoginPayload) => {
+      const response = await loginUser(payload);
+      await storeSession(response.token, response.user);
+      return response.user;
+    },
+    [storeSession],
+  );
+
+  const register = useCallback(
+    async (payload: RegisterPayload) => {
+      const response = await registerUser(payload);
+      await storeSession(response.token, response.user);
+      return response.user;
+    },
+    [storeSession],
+  );
+
+  const becomeArtist = useCallback(async () => {
+    const response = await api.post<{ user: AuthUser }>('/artist/become');
+    setUser(response.data.user);
+  }, []);
+
+  const followArtist = useCallback(async (artistId: string) => {
+    await api.post(`/artists/${artistId}/follow`);
+  }, []);
+
+  const unfollowArtist = useCallback(async (artistId: string) => {
+    await api.delete(`/artists/${artistId}/follow`);
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem(authTokenStorageKey);
+      if (storedToken) {
+        await logoutUser();
+      }
+    } finally {
+      await clearSession();
+    }
+  }, [clearSession]);
+
+  useEffect(() => {
+    let active = true;
+
+    const restoreSession = async () => {
+      try {
+        await refreshUser();
+      } catch {
+        await clearSession();
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void restoreSession();
+
+    return () => {
+      active = false;
+    };
+  }, [clearSession, refreshUser]);
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      token,
+      loading,
+      isAuthenticated: Boolean(user && token),
+      login,
+      register,
+      logout,
+      refreshUser,
+      becomeArtist,
+      followArtist,
+      unfollowArtist,
+    }),
+    [user, token, loading, login, register, logout, refreshUser, becomeArtist, followArtist, unfollowArtist],
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = (): AuthContextValue => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+
+  return context;
+};
