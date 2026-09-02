@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../api/axios';
@@ -69,25 +70,28 @@ const UploadScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Upload Song</Text>
-      <TextInput style={styles.input} placeholder="Title" placeholderTextColor="#666" value={title} onChangeText={setTitle} />
-      <TextInput style={styles.input} placeholder="Genre" placeholderTextColor="#666" value={genre} onChangeText={setGenre} />
-      
-      <TouchableOpacity style={styles.button} onPress={pickAudio}><Text style={styles.buttonText}>{audioFile ? 'Audio Selected' : 'Pick Audio'}</Text></TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={pickCover}><Text style={styles.buttonText}>{coverImage ? 'Cover Selected' : 'Pick Cover'}</Text></TouchableOpacity>
-      
-      {coverImage && <Image source={{ uri: coverImage.uri }} style={styles.preview} />}
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.header}>Upload Song</Text>
+        <TextInput style={styles.input} placeholder="Title" placeholderTextColor="#666" value={title} onChangeText={setTitle} />
+        <TextInput style={styles.input} placeholder="Genre" placeholderTextColor="#666" value={genre} onChangeText={setGenre} />
+        
+        <TouchableOpacity style={styles.button} onPress={pickAudio}><Text style={styles.buttonText}>{audioFile ? 'Audio Selected' : 'Pick Audio'}</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={pickCover}><Text style={styles.buttonText}>{coverImage ? 'Cover Selected' : 'Pick Cover'}</Text></TouchableOpacity>
+        
+        {coverImage && <Image source={{ uri: coverImage.uri }} style={styles.preview} />}
 
-      <TouchableOpacity style={styles.uploadButton} onPress={upload} disabled={loading}>
-        {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Upload</Text>}
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.uploadButton} onPress={upload} disabled={loading}>
+          {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Upload</Text>}
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#121212' },
+  container: { flex: 1, backgroundColor: '#121212' },
+  scrollContent: { padding: 20 },
   header: { fontSize: 24, fontWeight: 'bold', color: '#FFF', marginBottom: 20 },
   input: { backgroundColor: '#1E1E1E', color: '#FFF', padding: 15, borderRadius: 8, marginBottom: 15 },
   button: { backgroundColor: '#333', padding: 15, borderRadius: 8, marginBottom: 15 },

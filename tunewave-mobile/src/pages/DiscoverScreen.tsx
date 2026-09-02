@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Play, Search } from 'lucide-react-native';
 import api from '../api/axios';
 import { usePlayer, type Song } from '../context/PlayerContext';
@@ -19,7 +20,7 @@ const DiscoverScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.searchContainer}>
         <Search color="#666" size={20} />
         <TextInput 
@@ -43,15 +44,15 @@ const DiscoverScreen = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 50, backgroundColor: '#121212' },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1E1E', borderRadius: 8, padding: 10, marginBottom: 16 },
+  container: { flex: 1, backgroundColor: '#121212' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1E1E', borderRadius: 8, padding: 10, margin: 16, marginTop: 0 },
   searchInput: { flex: 1, marginLeft: 10, color: '#FFF' },
-  scrollContent: { paddingBottom: 100 },
+  scrollContent: { padding: 16 },
   songCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1E1E', padding: 10, borderRadius: 8, marginBottom: 10 },
   image: { width: 50, height: 50, borderRadius: 4 },
   info: { flex: 1, marginLeft: 10 },

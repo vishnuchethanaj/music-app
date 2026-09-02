@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const authTokenStorageKey = 'tunewave_auth_token';
 
 const api = axios.create({
-  // In React Native, localhost doesn't refer to your dev machine.
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5000/api',
   // You might need to use your machine's IP address if testing on a physical device.
   // For the emulator, 10.0.2.2 is usually the address of the host machine.
   baseURL: 'http://10.0.2.2:5000/api',

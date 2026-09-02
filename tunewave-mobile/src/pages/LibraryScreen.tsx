@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../api/axios';
 import { type Song } from '../context/PlayerContext';
 
@@ -30,32 +31,35 @@ const LibraryScreen = ({ navigation }: any) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Your Library</Text>
-      
-      <View style={styles.inputContainer}>
-        <TextInput 
-            style={styles.input} 
-            placeholder="New Playlist Name" 
-            placeholderTextColor="#666" 
-            value={newPlaylistName} 
-            onChangeText={setNewPlaylistName} 
-        />
-        <TouchableOpacity style={styles.createButton} onPress={createPlaylist}><Text style={styles.buttonText}>Create</Text></TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.header}>Your Library</Text>
+        
+        <View style={styles.inputContainer}>
+          <TextInput 
+              style={styles.input} 
+              placeholder="New Playlist Name" 
+              placeholderTextColor="#666" 
+              value={newPlaylistName} 
+              onChangeText={setNewPlaylistName} 
+          />
+          <TouchableOpacity style={styles.createButton} onPress={createPlaylist}><Text style={styles.buttonText}>Create</Text></TouchableOpacity>
+        </View>
 
-      <Text style={styles.sectionTitle}>Playlists</Text>
-      {playlists.map((pl) => (
-        <TouchableOpacity key={pl._id} style={styles.item} onPress={() => navigation.navigate('PlaylistDetails', { playlistId: pl._id })}>
-          <Text style={styles.itemText}>{pl.name}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+        <Text style={styles.sectionTitle}>Playlists</Text>
+        {playlists.map((pl) => (
+          <TouchableOpacity key={pl._id} style={styles.item} onPress={() => navigation.navigate('PlaylistDetails', { playlistId: pl._id })}>
+            <Text style={styles.itemText}>{pl.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 50, backgroundColor: '#121212' },
+  container: { flex: 1, backgroundColor: '#121212' },
+  scrollContent: { padding: 16 },
   header: { fontSize: 24, fontWeight: '900', color: '#FFF', marginBottom: 20 },
   inputContainer: { flexDirection: 'row', marginBottom: 20 },
   input: { flex: 1, backgroundColor: '#1E1E1E', color: '#FFF', padding: 10, borderRadius: 8 },
